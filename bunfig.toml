@@ -1,0 +1,8 @@
+[install]
+alias = {
+  "@": "./src",
+  "@components": "./src/components",
+  "@context": "./src/context",
+  "@routes": "./src/routes",
+  "@config": "./src/config"
+}
