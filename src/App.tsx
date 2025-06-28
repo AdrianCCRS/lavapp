@@ -2,7 +2,8 @@ import {Route, Routes} from 'react-router-dom';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 
 import Login from './features/auth/pages/Login';
-import Index from './features/dashboard/pages/Index'
+import Index from './features/reservations/pages/Index'
+import DefaultLayout from './layouts/DefaultLayout';
 
 function App() {
 
@@ -12,11 +13,19 @@ function App() {
         <Route path="/login" element={<Login/>} />  
       
         {/* Protected routes */}
-        <Route path='/dashboard' element={
-          <ProtectedRoute>
-            <Index/>
-          </ProtectedRoute> 
-        }/>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <DefaultLayout/>
+            </ProtectedRoute>
+          }
+          >
+
+          <Route index element={<Index/>}/>
+
+        </Route>
+        
       </Routes> 
     </>
   )
