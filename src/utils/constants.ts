@@ -1,0 +1,1 @@
+export const maxWashDuration: number = 8700;

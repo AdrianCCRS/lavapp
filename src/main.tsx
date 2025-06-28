@@ -9,7 +9,7 @@ import { HeroUIProvider } from '@heroui/system'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <HeroUIProvider>
+    <HeroUIProvider className='light'>
         <AuthProvider>
           <BrowserRouter>
             <App />

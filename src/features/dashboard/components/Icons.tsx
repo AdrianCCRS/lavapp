@@ -35,3 +35,62 @@ export const WashIcon = ({ size = 256, color = "#000000" }: WashIconProps) => (
     </svg>
 );
 
+export const TimeIcon = ({ size = 256, color = "#000000" }: WashIconProps) => (
+    <svg
+        width={`${size}px`}
+        height={`${size}px`}
+        viewBox="0 0 24 24"
+        className="icon"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+    >
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+            <g id="style=linear">
+                <g id="timer">
+                    <path
+                        id="vector"
+                        d="M21 13.25C21 18.218 16.968 22.25 12 22.25C7.032 22.25 3 18.218 3 13.25C3 8.282 7.032 4.25 12 4.25C16.968 4.25 21 8.282 21 13.25Z"
+                        stroke={color}
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    ></path>
+                    <path
+                        id="Vector"
+                        d="M12 8.25V13.25"
+                        stroke={color}
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    ></path>
+                    <path
+                        id="line"
+                        d="M9 1.75L15 1.75"
+                        stroke={color}
+                        stroke-width="1.5"
+                        stroke-miterlimit="10"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    ></path>
+                </g>
+            </g>
+        </g>
+    </svg>
+);
+
+
+
+<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+<g id="SVGRepo_iconCarrier"> <g id="style=linear"> <g id="timer"> 
+    <path id="vector" d="M21 13.25C21 18.218 16.968 22.25 12 22.25C7.032 22.25 3 18.218 3 13.25C3 8.282 7.032 4.25 12 4.25C16.968 4.25 21 8.282 21 13.25Z" 
+    stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+
+     <path id="Vector" d="M12 8.25V13.25" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+      stroke-linejoin="round"></path> 
+      
+      <path id="line" d="M9 1.75L15 1.75" stroke="#000000" stroke-width="1.5"
+       stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>

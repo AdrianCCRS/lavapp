@@ -5,12 +5,25 @@ import {heroui} from "@heroui/theme"
 export default {
   content: [
     "./index.html",
-    './src/features/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    "./node_modules/@heroui/theme/dist/components/(button|form|input|spinner|ripple).js",
+    "./src/features/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@heroui/theme/dist/components/(button|form|input|link|navbar|spinner|ripple).js"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors:{
+        background: "rgb(var(--background))",
+        text: "rgb(var(--text))",
+        primary: "rgb(var(--primary))",
+        secondary: "rgb(var(--secondary))",
+        card: "rgb(var(--card))",
+        "text-warning": "rgb(var(--text-warning))",
+        "text-danger": "rgb(var(--text-danger))",
+        "bg-danger": "rgb(var(--bg-danger))",
+        "text-success": "rgb(var(--text-success))",
+        "bg-success": "rgb(var(--bg-success))",
+      }
+    },
   },
   darkMode: "class",
   plugins: [heroui()],
