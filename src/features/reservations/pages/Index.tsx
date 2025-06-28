@@ -1,4 +1,4 @@
-import WashCard from "../components/WashCard";
+import WasherCard from "../components/WasherCard";
 import { useLiveWashers } from "../hooks/useLiveWashers";
 import { Spinner } from "@heroui/spinner";
 export default function Index() {
@@ -9,7 +9,7 @@ export default function Index() {
                <Spinner size="lg" variant="wave" />
                ) : (
                washers.map((washer) => (
-                   <WashCard
+                   <WasherCard
                    key={washer.id}
                    id={washer.id}
                    name={washer.name}

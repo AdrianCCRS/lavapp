@@ -3,7 +3,7 @@ import type { Washer } from "../types"
 import ReserveButton from "./ReserveButton"
 import { useAuth } from "@context/AuthContext"
 
-export default function WashCard(washerProps: Washer) {
+export default function WasherCard(washerProps: Washer) {
     const { customUser } = useAuth();
     const userId = customUser?.id || null;
     const userEmail = customUser?.email || null;
