@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  Navbar,
+  Navbar as HNavbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
@@ -17,7 +17,7 @@ type CNavbarProps = {
   username?: string;
 };
 
-export default function CNavbar({username}: CNavbarProps) {
+export default function Navbar({username}: CNavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const menuItems = [
@@ -34,7 +34,7 @@ export default function CNavbar({username}: CNavbarProps) {
   ];
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen}>
+    <HNavbar onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -88,7 +88,7 @@ export default function CNavbar({username}: CNavbarProps) {
           </NavbarMenuItem>
         ))}
       </NavbarMenu>
-    </Navbar>
+    </HNavbar>
   );
 }
 
