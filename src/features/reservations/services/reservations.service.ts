@@ -1,5 +1,5 @@
 import { db } from "@config/firebase.config";
-import { setDoc, doc, Timestamp, getDoc, query, getCountFromServer, collection, where, getDocs, QueryDocumentSnapshot, orderBy, limit, startAfter } from "firebase/firestore";
+import { setDoc, doc, Timestamp, getDoc, query, collection, where, getDocs, QueryDocumentSnapshot, orderBy, limit, startAfter } from "firebase/firestore";
 import type { Reservation, Wash } from "../types";
 import type { PaginatedReservations } from "../types";
 import { maxWashDuration } from "~/src/utils/constants";

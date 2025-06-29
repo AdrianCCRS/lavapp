@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot } from "firebase/firestore";
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 
 export {Timestamp};
 
