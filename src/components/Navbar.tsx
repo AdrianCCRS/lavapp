@@ -63,9 +63,6 @@ export default function Navbar({username}: CNavbarProps) {
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-          <Link href="#">Login</Link>
-        </NavbarItem>
         <NavbarItem>
             <Button color="primary" href="#" variant="flat" onPress={logout}>
             Salir

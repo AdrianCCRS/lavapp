@@ -6,7 +6,7 @@ export default function Index() {
     return (
             <div className="flex w-full h-auto gap-10 flex-wrap justify-center">
                {loading ? (
-               <Spinner size="lg" variant="wave" />
+               <Spinner size="lg" variant="default" />
                ) : (
                washers.map((washer) => (
                    <WasherCard

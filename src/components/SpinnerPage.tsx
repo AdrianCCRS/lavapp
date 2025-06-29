@@ -5,7 +5,8 @@ export default function SpinnerPage() {
     <div className="flex items-center justify-center h-screen w-screen bg-gray-200">
       <Spinner
         size="lg"
-        variant="wave"
+        variant="default"
+        color="primary"
       />
     </div>
   );

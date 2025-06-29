@@ -4,6 +4,7 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 import Login from './features/auth/pages/Login';
 import Index from './features/reservations/pages/Index'
 import DefaultLayout from './layouts/DefaultLayout';
+import UserReservations from './features/reservations/pages/UserReservations';
 
 function App() {
 
@@ -20,12 +21,10 @@ function App() {
               <DefaultLayout/>
             </ProtectedRoute>
           }
-          >
-
+        >
           <Route index element={<Index/>}/>
-
+          <Route path='reservations' element={<UserReservations/>}/>
         </Route>
-        
       </Routes> 
     </>
   )

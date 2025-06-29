@@ -8,7 +8,7 @@ export default function DefaultLayout() {
     return (
         <>
         <Navbar username={`${auth.customUser?.firstName || ""} ${auth.customUser?.secondName || ""} ${auth.customUser?.firstLastName || ""} ${auth.customUser?.secondLastName}`} />
-        <main className={`flex flex-1 min-w-0 justify-center items-center min-h-screen w-full px-10 py-12 bg-background}`}>
+        <main className={`flex flex-1 min-w-0 justify-center items-center min-h-screen w-screen xl:w-full px-10 py-12 bg-background}`}>
             <Outlet/>
         </main>
         </>

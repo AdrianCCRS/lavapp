@@ -1,7 +1,13 @@
+import type {SVGProps} from "react";
+
 interface WashIconProps {
     size?: number; // Size in pixels
     color?: string; // Custom color
 }
+
+export type IconSvgProps = SVGProps<SVGSVGElement> & {
+    size?: number;
+  };
 
 export const WashIcon = ({ size = 256, color = "#000000" }: WashIconProps) => (
     <svg
@@ -81,16 +87,82 @@ export const TimeIcon = ({ size = 256, color = "#000000" }: WashIconProps) => (
     </svg>
 );
 
+export const PlusIcon = ({size = 24, width, height, ...props}: IconSvgProps) => {
+return (
+    <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height={size || height}
+    role="presentation"
+    viewBox="0 0 24 24"
+    width={size || width}
+    {...props}
+    >
+    <g
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+    >
+        <path d="M6 12h12" />
+        <path d="M12 18V6" />
+    </g>
+    </svg>
+);
+};
 
+export const SearchIcon = (props: IconSvgProps) => {
+return (
+    <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+    >
+    <path
+        d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+    />
+    <path
+        d="M22 22L20 20"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+    />
+    </svg>
+);
+};
 
-<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-<g id="SVGRepo_iconCarrier"> <g id="style=linear"> <g id="timer"> 
-    <path id="vector" d="M21 13.25C21 18.218 16.968 22.25 12 22.25C7.032 22.25 3 18.218 3 13.25C3 8.282 7.032 4.25 12 4.25C16.968 4.25 21 8.282 21 13.25Z" 
-    stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-
-     <path id="Vector" d="M12 8.25V13.25" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
-      stroke-linejoin="round"></path> 
-      
-      <path id="line" d="M9 1.75L15 1.75" stroke="#000000" stroke-width="1.5"
-       stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>
+export const ChevronDownIcon = ({strokeWidth = 1.5, ...otherProps}: IconSvgProps) => {
+    return (
+      <svg
+        aria-hidden="true"
+        fill="none"
+        focusable="false"
+        height="1em"
+        role="presentation"
+        viewBox="0 0 24 24"
+        width="1em"
+        {...otherProps}
+      >
+        <path
+          d="m19.92 8.95-6.52 6.52c-.77.77-2.03.77-2.8 0L4.08 8.95"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeMiterlimit={10}
+          strokeWidth={strokeWidth}
+        />
+      </svg>
+    );
+  };

@@ -1,4 +1,7 @@
 import { Timestamp } from "firebase/firestore";
+import type { QueryDocumentSnapshot, DocumentData, QuerySnapshot } from "firebase/firestore";
+
+export {Timestamp};
 
 export interface Washer{
     id: string;
@@ -10,6 +13,7 @@ export interface Washer{
 }
 
 export interface Reservation {
+    id?: string;
     washerId: string;
     userId: string;
     userEmail: string;
@@ -23,4 +27,15 @@ export interface Wash {
     endTime: Timestamp | null;
     maxDuration: Timestamp;
     notes: string;
+}
+
+export interface ReservationCardProps {
+    washerId: string;
+    createdAt: Timestamp;
+}
+
+export interface PaginatedReservations {
+    reservations: Reservation[];
+    lastVisible: QueryDocumentSnapshot<DocumentData, DocumentData>;
+
 }

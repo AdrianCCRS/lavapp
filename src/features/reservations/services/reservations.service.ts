@@ -1,6 +1,7 @@
 import { db } from "@config/firebase.config";
-import { setDoc, doc, Timestamp, getDoc } from "firebase/firestore";
+import { setDoc, doc, Timestamp, getDoc, query, getCountFromServer, collection, where, getDocs, QueryDocumentSnapshot, orderBy, limit, startAfter } from "firebase/firestore";
 import type { Reservation, Wash } from "../types";
+import type { PaginatedReservations } from "../types";
 import { maxWashDuration } from "~/src/utils/constants";
 
 export async function reserve(userId: string, washerId: string, userEmail: string): Promise<void> {
@@ -71,3 +72,32 @@ export async function startWashing(userId: string, washerId: string, notes: stri
         throw new Error("No se pudo iniciar el lavado.");
     }
 }
+
+export async function getPaginatedReservationsByUser(
+    userId: string,
+    pageSize: number = 10,
+    lastDoc?: QueryDocumentSnapshot,
+    direction: "asc" | "desc" = "desc"
+  ): Promise<PaginatedReservations> {
+    let q = query(
+      collection(db, "reservations"),
+      where("userId", "==", userId),
+      orderBy("createdAt", direction),
+      limit(pageSize)
+    );
+  
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
+    }
+  
+    const snapshot = await getDocs(q);
+  
+    return {
+      reservations: snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id
+      }) as Reservation),
+      lastVisible: snapshot.docs[snapshot.docs.length - 1],
+    };
+  }
+  
