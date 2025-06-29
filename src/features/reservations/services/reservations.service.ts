@@ -99,5 +99,41 @@ export async function getPaginatedReservationsByUser(
       }) as Reservation),
       lastVisible: snapshot.docs[snapshot.docs.length - 1],
     };
+}
+
+export async function getReservationsByDate(date: Timestamp, userId: string): Promise<Reservation[]> {
+    try {
+      const localDate = date.toDate();
+  
+      // UTC día local: 00:00:00 y 23:59:59 en tu zona horaria (ej. -05:00)
+      const startOfDay = new Date(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 0, 0, 0);
+      const endOfDay = new Date(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 23, 59, 59, 999);
+  
+      const startTimestamp = Timestamp.fromDate(startOfDay);
+      const endTimestamp = Timestamp.fromDate(endOfDay);
+  
+      const q = query(
+        collection(db, "reservations"),
+        where("userId", "==", userId),
+        where("createdAt", ">=", startTimestamp),
+        where("createdAt", "<=", endTimestamp)
+      );
+  
+      const snapshot = await getDocs(q);
+  
+      if (snapshot.empty) {
+        console.log("No reservations found for the given date.");
+        return [];
+      }
+  
+      return snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id
+      }) as Reservation);
+    } catch (error) {
+      console.error("Error fetching reservations by date:", error);
+      throw new Error("No se pudieron obtener las reservas por fecha.");
+    }
   }
+  
   

@@ -10,20 +10,34 @@ import type { Reservation, Timestamp } from "../types";
 import type { SortDescriptor } from "@heroui/table";
 import type { QueryDocumentSnapshot } from "firebase/firestore";
 
-export default function ReservationsTable({ userId }: { userId: string }) {
+export default function ReservationsTable({
+  userId,
+  externalReservations,
+}: {
+  userId: string;
+  externalReservations?: Reservation[] | null;
+}) {
+  // Estados y hooks de paginación solo si no está filtrado
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(1);
-  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "createdAt",
     direction: "descending",
   });
-
   const cursors = useRef<Record<number, QueryDocumentSnapshot | undefined>>({});
 
+  // Si hay externalReservations (filtro), las usamos directo
   useEffect(() => {
+    if (externalReservations) {
+      setReservations(externalReservations);
+      setLoading(false);
+      return;
+    }
+
+    // Solo cargar desde Firestore si no hay filtro
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -38,7 +52,7 @@ export default function ReservationsTable({ userId }: { userId: string }) {
 
         setReservations(result.reservations);
         cursors.current[page] = result.lastVisible;
-        setHasMore(result.reservations.length === rowsPerPage); // Only true if there might be another page
+        setHasMore(result.reservations.length === rowsPerPage);
       } catch (err) {
         console.error("Error loading reservations:", err);
       } finally {
@@ -47,7 +61,7 @@ export default function ReservationsTable({ userId }: { userId: string }) {
     };
 
     fetchData();
-  }, [userId, rowsPerPage, page]);
+  }, [userId, rowsPerPage, page, sortDescriptor, externalReservations]);
 
   const sortedItems = useMemo(() => {
     const sorted = [...reservations].sort((a, b) => {
@@ -99,7 +113,7 @@ export default function ReservationsTable({ userId }: { userId: string }) {
   }, []);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 border p-4 rounded-lg bg-card shadow-lg">
       <div className="flex justify-between items-center">
         <span className="text-gray-500 text-sm">
           Página {page}
