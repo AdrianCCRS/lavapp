@@ -1,36 +1,55 @@
 import { db } from "@config/firebase.config";
-import { setDoc, doc, Timestamp, getDoc, query, collection, where, getDocs, QueryDocumentSnapshot, orderBy, limit, startAfter } from "firebase/firestore";
+import { setDoc, doc, Timestamp, getDoc, query, updateDoc, collection, where, getDocs, QueryDocumentSnapshot, orderBy, limit, startAfter } from "firebase/firestore";
 import type { Reservation, Wash } from "../types";
 import type { PaginatedReservations } from "../types";
 import { maxWashDuration } from "~/src/utils/constants";
 
-export async function reserve(userId: string, washerId: string, userEmail: string): Promise<void> {
-    const createdAt = Timestamp.now();
+export async function reserve(studentCode: string, washerId: string, userEmail: string): Promise<void> {
+  const createdAt = Timestamp.now();
+  const state = "waiting"; 
 
-    // Format the current date and time as YYYY-MM-DD_HH-MM-SS
-    const now = new Date();
-    const dateStr = now.toISOString().split("T")[0];
-    const timeStr = now.toTimeString().split(" ")[0].replace(/:/g, "-");
+  const now = new Date();
+  const dateStr = now.toISOString().split("T")[0];
+  const timeStr = now.toTimeString().split(" ")[0].replace(/:/g, "-");
 
-    // Create a unique document ID for the reservation
-    const reservationId = `reservation_${userId}_${washerId}_${dateStr}_${timeStr}`;
+  const reservationId = `reservation_${studentCode}_${washerId}_${dateStr}_${timeStr}`;
 
-    const reservation: Reservation = {
-        washerId,
-        userId,
-        userEmail,
-        createdAt
-    };
+  const reservation: Reservation = {
+    washerId,
+    studentCode,
+    userEmail,
+    createdAt,
+    state
+  };
 
-    const reservationRef = doc(db, "reservations", reservationId);
+  const reservationRef = doc(db, "reservations", reservationId);
+  const userRef = doc(db, "users", studentCode);
 
-    try {
-        await setDoc(reservationRef, reservation);
-        disableWasher(washerId);
-    } catch (error) {
-        console.error("Error creating reservation:", error);
-        throw new Error("No se pudo realizar la reserva.");
+  try {
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      throw new Error("Usuario no encontrado.");
     }
+
+    const userData = userSnap.data();
+    const currentReservations: string[] = userData.currentReservations || [];
+
+    if (currentReservations.length >= 2) {
+      throw new Error("No puedes tener más de dos reservas activas.");
+    }
+    
+    await setDoc(reservationRef, reservation);
+    await updateDoc(userRef, {
+      currentReservations: [...currentReservations, reservationId]
+    });
+
+    await disableWasher(washerId);
+
+  } catch (error) {
+    console.error("Error creando la reserva:", error);
+    throw new Error("No se pudo realizar la reserva.");
+  }
 }
 
 async function disableWasher(washerId: string): Promise<void> {
@@ -49,20 +68,20 @@ async function disableWasher(washerId: string): Promise<void> {
 
 }
 
-export async function startWashing(userId: string, washerId: string, notes: string): Promise<void> {
+export async function startWashing(studentCode: string, washerId: string, notes: string): Promise<void> {
     const startTime = Timestamp.now();
     const maxDuration = new Timestamp(startTime.seconds + maxWashDuration / 1000, startTime.nanoseconds + (maxWashDuration % 1000) * 1e6);
 
     const wash: Wash = {
         washerId: washerId,
-        userId: userId,
+        studentCode: studentCode,
         startTime: startTime,
         endTime: null,
         maxDuration: maxDuration,
         notes: notes
     };
 
-    const washRef = doc(db, "washes", `wash_${userId}_${washerId}_${startTime.toDate().toISOString()}`);
+    const washRef = doc(db, "washes", `wash_${studentCode}_${washerId}_${startTime.toDate().toISOString()}`);
 
     try {
         await setDoc(washRef, wash);
@@ -74,14 +93,14 @@ export async function startWashing(userId: string, washerId: string, notes: stri
 }
 
 export async function getPaginatedReservationsByUser(
-    userId: string,
+    studentCode: string,
     pageSize: number = 10,
     lastDoc?: QueryDocumentSnapshot,
     direction: "asc" | "desc" = "desc"
   ): Promise<PaginatedReservations> {
     let q = query(
       collection(db, "reservations"),
-      where("userId", "==", userId),
+      where("studentCode", "==", studentCode),
       orderBy("createdAt", direction),
       limit(pageSize)
     );
@@ -101,9 +120,10 @@ export async function getPaginatedReservationsByUser(
     };
 }
 
-export async function getReservationsByDate(date: Timestamp, userId: string): Promise<Reservation[]> {
+export async function getReservationsByDate(date: Timestamp, studentCode: string): Promise<Reservation[]> {
     try {
       const localDate = date.toDate();
+      console.log(localDate)
   
       // UTC día local: 00:00:00 y 23:59:59 en tu zona horaria (ej. -05:00)
       const startOfDay = new Date(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 0, 0, 0);
@@ -114,7 +134,7 @@ export async function getReservationsByDate(date: Timestamp, userId: string): Pr
   
       const q = query(
         collection(db, "reservations"),
-        where("userId", "==", userId),
+        where("studentCode", "==", studentCode),
         where("createdAt", ">=", startTimestamp),
         where("createdAt", "<=", endTimestamp)
       );
@@ -134,6 +154,6 @@ export async function getReservationsByDate(date: Timestamp, userId: string): Pr
       console.error("Error fetching reservations by date:", error);
       throw new Error("No se pudieron obtener las reservas por fecha.");
     }
-  }
+}
   
   

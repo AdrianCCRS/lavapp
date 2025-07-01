@@ -5,6 +5,7 @@
       "name": "lavapp",
       "dependencies": {
         "@heroui/button": "^2.2.22",
+        "@heroui/chip": "^2.2.18",
         "@heroui/date-picker": "^2.3.22",
         "@heroui/dropdown": "^2.3.22",
         "@heroui/form": "^2.1.21",
@@ -262,6 +263,8 @@
     "@heroui/calendar": ["@heroui/calendar@2.2.22", "", { "dependencies": { "@heroui/button": "2.2.22", "@heroui/dom-animation": "2.1.9", "@heroui/framer-utils": "2.1.18", "@heroui/react-utils": "2.1.11", "@heroui/shared-icons": "2.1.9", "@heroui/shared-utils": "2.1.9", "@heroui/use-aria-button": "2.2.16", "@internationalized/date": "3.8.2", "@react-aria/calendar": "3.8.3", "@react-aria/focus": "3.20.5", "@react-aria/i18n": "3.12.10", "@react-aria/interactions": "3.25.3", "@react-aria/utils": "3.29.1", "@react-aria/visually-hidden": "3.8.25", "@react-stately/calendar": "3.8.2", "@react-stately/utils": "3.10.7", "@react-types/button": "3.12.2", "@react-types/calendar": "3.7.2", "@react-types/shared": "3.30.0", "scroll-into-view-if-needed": "3.0.10" }, "peerDependencies": { "@heroui/system": ">=2.4.17", "@heroui/theme": ">=2.4.6", "framer-motion": ">=11.5.6 || >=12.0.0-alpha.1", "react": ">=18 || >=19.0.0-rc.0", "react-dom": ">=18 || >=19.0.0-rc.0" } }, "sha512-5/hjKJIqKw+u/GiUcHVVVOXjYFCPp87n7mmFgmMgTd6hnncAnn+/jRmBkhLd4fxj3lBIhdoLX3RFu8Vp/zhQpQ=="],
 
     "@heroui/checkbox": ["@heroui/checkbox@2.3.21", "", { "dependencies": { "@heroui/form": "2.1.21", "@heroui/react-utils": "2.1.11", "@heroui/shared-utils": "2.1.9", "@heroui/use-callback-ref": "2.1.7", "@heroui/use-safe-layout-effect": "2.1.7", "@react-aria/checkbox": "3.15.7", "@react-aria/focus": "3.20.5", "@react-aria/interactions": "3.25.3", "@react-aria/utils": "3.29.1", "@react-stately/checkbox": "3.6.15", "@react-stately/toggle": "3.8.5", "@react-types/checkbox": "3.9.5", "@react-types/shared": "3.30.0" }, "peerDependencies": { "@heroui/system": ">=2.4.17", "@heroui/theme": ">=2.4.3", "react": ">=18 || >=19.0.0-rc.0", "react-dom": ">=18 || >=19.0.0-rc.0" } }, "sha512-j2fmBBD4FRzJAJErACsUBj+b0yQ7Cs3qnwSJJdK/j+5PEwBP+WYYWai9I4U9rNzhspWkk8naCI652asjRX1c4Q=="],
+
+    "@heroui/chip": ["@heroui/chip@2.2.18", "", { "dependencies": { "@heroui/react-utils": "2.1.11", "@heroui/shared-icons": "2.1.9", "@heroui/shared-utils": "2.1.9", "@react-aria/focus": "3.20.5", "@react-aria/interactions": "3.25.3", "@react-aria/utils": "3.29.1" }, "peerDependencies": { "@heroui/system": ">=2.4.17", "@heroui/theme": ">=2.4.6", "react": ">=18 || >=19.0.0-rc.0", "react-dom": ">=18 || >=19.0.0-rc.0" } }, "sha512-8v+/3PfrFfxSTd9+VlQZVLURvBRIof9TLMD2Y1X5ZlrFrwnLkQYHQVqLZVpIMG8+ood9Vy3rq/qbqCdCSJTlIQ=="],
 
     "@heroui/date-input": ["@heroui/date-input@2.3.21", "", { "dependencies": { "@heroui/form": "2.1.21", "@heroui/react-utils": "2.1.11", "@heroui/shared-utils": "2.1.9", "@internationalized/date": "3.8.2", "@react-aria/datepicker": "3.14.5", "@react-aria/i18n": "3.12.10", "@react-aria/utils": "3.29.1", "@react-stately/datepicker": "3.14.2", "@react-types/datepicker": "3.12.2", "@react-types/shared": "3.30.0" }, "peerDependencies": { "@heroui/system": ">=2.4.17", "@heroui/theme": ">=2.4.16", "react": ">=18 || >=19.0.0-rc.0", "react-dom": ">=18 || >=19.0.0-rc.0" } }, "sha512-MrUqzAnYJmhFG7t/cuTmw3TOKJGpvQH3rJ7XRvD7KSyg7vRgoA4+s2gyyySpxuTi7LJ8GKH2XUjSkrBFAtx9/w=="],
 

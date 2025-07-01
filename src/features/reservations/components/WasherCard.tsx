@@ -5,7 +5,7 @@ import { useAuth } from "@context/AuthContext"
 
 export default function WasherCard(washerProps: Washer) {
     const { customUser } = useAuth();
-    const userId = customUser?.id || null;
+    const studentCode = customUser?.id || null;
     const userEmail = customUser?.email || null;
     return (
         <div className="flex min-w-md bg-card flex-col h-auto w-auto items-center justify-center p-6 border border-slate-400 rounded-lg shadow-md">
@@ -41,10 +41,10 @@ export default function WasherCard(washerProps: Washer) {
                             Estado: No disponible
                         </h3>
                     )}
-                    {userId && userEmail && (
+                    {studentCode && userEmail && (
                         <ReserveButton
                             isDisabled={!washerProps.available}
-                            userId={userId}
+                            studentCode={studentCode}
                             washerId={washerProps.id}
                             userEmail={userEmail}
                         />

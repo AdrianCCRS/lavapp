@@ -4,6 +4,7 @@ import {
 } from "@heroui/table";
 import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
+import {Chip} from "@heroui/chip";
 
 import { getPaginatedReservationsByUser } from "../services/reservations.service";
 import type { Reservation, Timestamp } from "../types";
@@ -11,10 +12,10 @@ import type { SortDescriptor } from "@heroui/table";
 import type { QueryDocumentSnapshot } from "firebase/firestore";
 
 export default function ReservationsTable({
-  userId,
+  studentCode,
   externalReservations,
 }: {
-  userId: string;
+  studentCode: string;
   externalReservations?: Reservation[] | null;
 }) {
   // Estados y hooks de paginación solo si no está filtrado
@@ -44,7 +45,7 @@ export default function ReservationsTable({
         const cursor = page === 1 ? undefined : cursors.current[page - 1];
 
         const result = await getPaginatedReservationsByUser(
-          userId,
+          studentCode,
           rowsPerPage,
           cursor,
           sortDescriptor.direction === "descending" ? "desc" : "asc"
@@ -61,7 +62,7 @@ export default function ReservationsTable({
     };
 
     fetchData();
-  }, [userId, rowsPerPage, page, sortDescriptor, externalReservations]);
+  }, [studentCode, rowsPerPage, page, sortDescriptor, externalReservations]);
 
   const sortedItems = useMemo(() => {
     const sorted = [...reservations].sort((a, b) => {
@@ -77,7 +78,12 @@ export default function ReservationsTable({
     return sorted;
   }, [reservations, sortDescriptor]);
 
-  
+  const stateColorMap: Record<string, [color: "warning" | "danger" | "success" | "default", label: string]> = {
+    waiting: ["warning", "ESPERANDO"],
+    cancelled: ["danger", "CANCELADA"],
+    completed: ["success", "COMPLETADA"],
+  };
+
   const renderCell = useCallback((reservation: Reservation, columnKey: React.Key) => {
     const cellValue = reservation[columnKey as keyof Reservation];
 
@@ -90,6 +96,15 @@ export default function ReservationsTable({
             {(cellValue as Timestamp).toDate().toLocaleString("es-CO")}
           </span>
         );
+      case "state":
+        const state = cellValue as string;
+        const color = stateColorMap[state]?.[0] || "default";
+        const label = stateColorMap[state]?.[1] || "INVALIDO";
+        return (
+          <Chip color={color} variant="flat">
+            {label}
+          </Chip>
+        );
       default:
         return String(cellValue);
     }
@@ -97,7 +112,8 @@ export default function ReservationsTable({
 
   const headerColumns = [
     { name: "ID DE LA LAVADORA", uid: "washerId", sortable: true },
-    { name: "CREATED AT", uid: "createdAt", sortable: true },
+    { name: "FECHA", uid: "createdAt", sortable: true },
+    {name: "ESTADO", uid: "state", sortable: false },
   ];
 
   const onRowsPerPageChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {

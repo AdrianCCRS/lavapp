@@ -4,14 +4,14 @@ import { reserve } from "../services/reservations.service";
 
 interface ReserveButtonProps {
   isDisabled: boolean;
-  userId: string;
+  studentCode: string;
   washerId: string;
   userEmail: string;
 }
 
 export default function ReserveButton({
   isDisabled,
-  userId,
+  studentCode,
   washerId,
   userEmail,
 }: ReserveButtonProps) {
@@ -20,7 +20,7 @@ export default function ReserveButton({
   async function handleReserve() {
     setLoading(true);
     try {
-      await reserve(userId, washerId, userEmail);
+      await reserve(studentCode, washerId, userEmail);
       // Optionally show success toast here
     } catch (error) {
       // Optionally show error toast here

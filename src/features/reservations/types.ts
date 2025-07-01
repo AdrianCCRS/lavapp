@@ -15,14 +15,15 @@ export interface Washer{
 export interface Reservation {
     id?: string;
     washerId: string;
-    userId: string;
+    studentCode: string;
     userEmail: string;
     createdAt: Timestamp;
+    state: "waiting" | "cancelled" | "completed";
 }
 
 export interface Wash {
     washerId: string;
-    userId: string;
+    studentCode: string;
     startTime: Timestamp;
     endTime: Timestamp | null;
     maxDuration: Timestamp;

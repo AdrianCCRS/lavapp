@@ -17,12 +17,18 @@ export default function ReservationDateCard({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedDate) {
-      // Convertir el DateValue a Date
-      const jsDate = new Date(selectedDate.toString()); // o selectedDate.toDate() si está disponible
+      const jsDate = new Date(
+        selectedDate.year,
+        selectedDate.month - 1,
+        selectedDate.day,
+        0, 0, 0
+      );
       const timestamp = Timestamp.fromDate(jsDate);
+      console.log("Fecha enviada al filtro:", jsDate.toString());
       onFilter(timestamp);
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center gap-5">

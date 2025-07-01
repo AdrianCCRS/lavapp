@@ -48,9 +48,9 @@ export async function login(
       }
   
       const userData = querySnapshot.docs[0].data();
-      const userId = querySnapshot.docs[0].id;
+      const studentCode = querySnapshot.docs[0].id;
       return {
-        id: userId,
+        id: studentCode,
         firstName: userData.firstName || "",
         secondName: userData.secondName || "",
         firstLastName: userData.firstLastName || "",

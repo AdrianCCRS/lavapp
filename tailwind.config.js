@@ -7,7 +7,7 @@ export default {
     "./index.html",
     "./src/features/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@heroui/theme/dist/components/(button|date-picker|dropdown|form|input|link|navbar|pagination|spinner|table|ripple|calendar|date-input|popover|menu|divider|checkbox|spacer).js"
+    "./node_modules/@heroui/theme/dist/components/(button|chip|date-picker|dropdown|form|input|link|navbar|pagination|spinner|table|ripple|calendar|date-input|popover|menu|divider|checkbox|spacer).js"
   ],
   theme: {
     extend: {
