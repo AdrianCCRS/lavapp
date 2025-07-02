@@ -6,6 +6,7 @@ import { maxWashDuration } from "~/src/utils/constants";
 
 export async function reserve(studentCode: string, washerId: string, userEmail: string): Promise<void> {
   const createdAt = Timestamp.now();
+  const expiresAt = new Timestamp(createdAt.seconds + 300, createdAt.nanoseconds);
   const state = "waiting"; 
 
   const now = new Date();
@@ -19,6 +20,7 @@ export async function reserve(studentCode: string, washerId: string, userEmail: 
     studentCode,
     userEmail,
     createdAt,
+    expiresAt,
     state
   };
 
@@ -154,6 +156,37 @@ export async function getReservationsByDate(date: Timestamp, studentCode: string
       console.error("Error fetching reservations by date:", error);
       throw new Error("No se pudieron obtener las reservas por fecha.");
     }
+}
+
+export async function getReservationById(reservationId: string): Promise<Reservation | null> {
+  try {
+    const reservationRef = doc(db, "reservations", reservationId);
+    const snapshot = await getDoc(reservationRef);
+
+    if (!snapshot.exists()) {
+      console.log("No reservation found.");
+      return null;
+    }
+
+    const data = snapshot.data();
+    if (!data) {
+      throw new Error("Failed to retrieve reservation data.");
+    }
+
+    const reservation: Reservation = {
+      washerId: data.washerId,
+      studentCode: data.studentCode,
+      userEmail: data.userEmail,
+      createdAt: data.createdAt,
+      expiresAt: data.expiresAt,
+      state: data.state,
+    };
+
+    return reservation;
+  } catch (error) {
+    console.error("Error fetching reservation by ID:", error);
+    throw new Error("No se pudo obtener la reserva.");
+  }
 }
   
   

@@ -55,6 +55,7 @@ export async function login(
         secondName: userData.secondName || "",
         firstLastName: userData.firstLastName || "",
         secondLastName: userData.secondLastName || "",
+        currentReservations: userData.currentReservations || [],
         email: userData.email || "",
         role: userData.role,
         phoneNumber: userData.phoneNumber || ""

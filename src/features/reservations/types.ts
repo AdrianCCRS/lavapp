@@ -17,6 +17,7 @@ export interface Reservation {
     washerId: string;
     studentCode: string;
     userEmail: string;
+    expiresAt: Timestamp;
     createdAt: Timestamp;
     state: "waiting" | "cancelled" | "completed";
 }

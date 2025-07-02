@@ -9,6 +9,7 @@ export type User = {
     secondName: string;
     firstLastName: string;
     secondLastName: string;
+    currentReservations: string[];
     email: string;
     role: "user" | "fiscal";
 }

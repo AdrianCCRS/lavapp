@@ -23,6 +23,7 @@ export default function ReserveButton({
       await reserve(studentCode, washerId, userEmail);
       // Optionally show success toast here
     } catch (error) {
+      console.log(error)
       // Optionally show error toast here
     } finally {
       setLoading(false);
