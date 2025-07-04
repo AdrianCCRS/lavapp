@@ -10,6 +10,7 @@ import { getPaginatedReservationsByUser } from "../services/reservations.service
 import type { Reservation, Timestamp } from "../types";
 import type { SortDescriptor } from "@heroui/table";
 import type { QueryDocumentSnapshot } from "firebase/firestore";
+import { useActiveReservations } from "../hooks/useActiveReservations";
 
 export default function ReservationsTable({
   studentCode,
@@ -19,6 +20,7 @@ export default function ReservationsTable({
   externalReservations?: Reservation[] | null;
 }) {
   // Estados y hooks de paginación solo si no está filtrado
+  const { activeReservations } = useActiveReservations(studentCode);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,22 @@ export default function ReservationsTable({
     };
 
     fetchData();
-  }, [studentCode, rowsPerPage, page, sortDescriptor, externalReservations]);
+  }, [studentCode, rowsPerPage, page, sortDescriptor, externalReservations, activeReservations]);
+
+  /*const displayedItems = useMemo(() => {
+    if (page !== 1) {
+      return reservations;
+      console.log(reservations)
+    }
+  
+    const itemsCopy = [...reservations];
+    for (let i = 0; i < activeReservations.length && i < 2; i++) {
+      itemsCopy[i] = activeReservations[i];
+    }
+  
+    console.log(itemsCopy)
+    return itemsCopy;
+  }, [page, reservations, activeReservations]);*/
 
   const sortedItems = useMemo(() => {
     const sorted = [...reservations].sort((a, b) => {

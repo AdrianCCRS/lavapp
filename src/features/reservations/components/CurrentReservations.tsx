@@ -1,41 +1,23 @@
-import { useEffect, useState } from "react";
 import { useAuth } from "@context/AuthContext";
-import { getReservationById } from "../services/reservations.service";
-import type { Reservation } from "../types";
 import { Spinner } from "@heroui/spinner";
 import CurrentReservationCard from "./CurrentReservationCard";
+import { useActiveReservations } from "../hooks/useActiveReservations";
 
 export default function CurrentReservations() {
   const { customUser } = useAuth();
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { activeReservations, loadingActive } = useActiveReservations(customUser?.id || "");
 
-  useEffect(() => {
-    const fetchReservations = async () => {
-      if (!customUser?.currentReservations) return;
-
-      setLoading(true);
-      const fetched = await Promise.all(
-        customUser.currentReservations.map(getReservationById)
-      );
-      setReservations(fetched.filter((r): r is Reservation => r !== null));
-      setLoading(false);
-    };
-
-    fetchReservations();
-  }, [customUser?.currentReservations]);
-
-  if (loading) {
+  if (loadingActive) {
     return <Spinner label="Cargando reservas..." />;
   }
 
   return (
     <div className="flex flex-col gap-4 bg-background p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold">Reservas activas</h2>
-      {reservations.length === 0 ? (
+      {activeReservations.length === 0 ? (
         <p className="text-gray-600">No tienes reservas activas.</p>
       ) : (
-        reservations.map((res) => (
+        activeReservations.map((res) => (
           <CurrentReservationCard key={res.washerId} reservation={res} />
         ))
       )}

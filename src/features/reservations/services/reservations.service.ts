@@ -6,9 +6,16 @@ import { maxWashDuration } from "~/src/utils/constants";
 
 export async function reserve(studentCode: string, washerId: string, userEmail: string): Promise<void> {
   const createdAt = Timestamp.now();
-  const expiresAt = new Timestamp(createdAt.seconds + 300, createdAt.nanoseconds);
-  const state = "waiting"; 
 
+  const nextMinute = new Date(createdAt.toDate());
+  nextMinute.setSeconds(0, 0); 
+  nextMinute.setMinutes(nextMinute.getMinutes() + 1); 
+
+  const expirationTime = new Date(nextMinute);
+  expirationTime.setMinutes(expirationTime.getMinutes() + 4);
+  
+  const expiresAt = Timestamp.fromDate(expirationTime);
+  const state = "waiting";
   const now = new Date();
   const dateStr = now.toISOString().split("T")[0];
   const timeStr = now.toTimeString().split(" ")[0].replace(/:/g, "-");
