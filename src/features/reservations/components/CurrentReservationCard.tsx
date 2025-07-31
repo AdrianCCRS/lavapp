@@ -1,9 +1,11 @@
-import { useCountdown } from "../hooks/useCountdown";
+import { useCountdown } from "@/hooks/useCountdown";
 import type { Reservation } from "../types";
 import { Button } from "@heroui/button";
+import { useNavigate } from "react-router-dom";
 
-export default function ReservationCard({ reservation }: { reservation: Reservation }) {
+export default function CurrentReservationCard({ reservation }: { reservation: Reservation }) {
   const expiresAt = reservation.expiresAt.toDate(); 
+  const navigate = useNavigate();
   const { minutes, seconds, isExpired } = useCountdown(expiresAt);
 
   return (
@@ -23,7 +25,7 @@ export default function ReservationCard({ reservation }: { reservation: Reservat
       )}
 
       {!isExpired && (
-        <Button color="primary" className="mt-2">
+        <Button color="primary" className="mt-2" onPress={() => {navigate(`/start/washer/${reservation.washerId}/reservation/${reservation.id}`)}}>
           Iniciar lavado
         </Button>
       )}

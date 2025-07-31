@@ -1,8 +1,7 @@
 import { db } from "@config/firebase.config";
 import { setDoc, doc, Timestamp, getDoc, query, updateDoc, collection, where, getDocs, QueryDocumentSnapshot, orderBy, limit, startAfter } from "firebase/firestore";
-import type { Reservation, Wash } from "../types";
+import type { Reservation } from "../types";
 import type { PaginatedReservations } from "../types";
-import { maxWashDuration } from "~/src/utils/constants";
 
 export async function reserve(studentCode: string, washerId: string, userEmail: string): Promise<void> {
   const createdAt = Timestamp.now();
@@ -23,6 +22,7 @@ export async function reserve(studentCode: string, washerId: string, userEmail: 
   const reservationId = `reservation_${studentCode}_${washerId}_${dateStr}_${timeStr}`;
 
   const reservation: Reservation = {
+    id: reservationId,
     washerId,
     studentCode,
     userEmail,
@@ -75,30 +75,6 @@ async function disableWasher(washerId: string): Promise<void> {
         console.error("Error disabling washer: ", error)
     }
 
-}
-
-export async function startWashing(studentCode: string, washerId: string, notes: string): Promise<void> {
-    const startTime = Timestamp.now();
-    const maxDuration = new Timestamp(startTime.seconds + maxWashDuration / 1000, startTime.nanoseconds + (maxWashDuration % 1000) * 1e6);
-
-    const wash: Wash = {
-        washerId: washerId,
-        studentCode: studentCode,
-        startTime: startTime,
-        endTime: null,
-        maxDuration: maxDuration,
-        notes: notes
-    };
-
-    const washRef = doc(db, "washes", `wash_${studentCode}_${washerId}_${startTime.toDate().toISOString()}`);
-
-    try {
-        await setDoc(washRef, wash);
-        console.log("Lavado iniciado exitosamente:", wash);
-    } catch (error) {
-        console.error("Error starting wash:", error);
-        throw new Error("No se pudo iniciar el lavado.");
-    }
 }
 
 export async function getPaginatedReservationsByUser(
@@ -181,6 +157,7 @@ export async function getReservationById(reservationId: string): Promise<Reserva
     }
 
     const reservation: Reservation = {
+      id: snapshot.id,
       washerId: data.washerId,
       studentCode: data.studentCode,
       userEmail: data.userEmail,

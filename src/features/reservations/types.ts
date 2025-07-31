@@ -13,22 +13,13 @@ export interface Washer{
 }
 
 export interface Reservation {
-    id?: string;
+    id: string;
     washerId: string;
     studentCode: string;
     userEmail: string;
     expiresAt: Timestamp;
     createdAt: Timestamp;
     state: "waiting" | "cancelled" | "completed";
-}
-
-export interface Wash {
-    washerId: string;
-    studentCode: string;
-    startTime: Timestamp;
-    endTime: Timestamp | null;
-    maxDuration: Timestamp;
-    notes: string;
 }
 
 export interface ReservationCardProps {
