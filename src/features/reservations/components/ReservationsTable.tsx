@@ -11,6 +11,7 @@ import type { Reservation, Timestamp } from "../types";
 import type { SortDescriptor } from "@heroui/table";
 import type { QueryDocumentSnapshot } from "firebase/firestore";
 import { useActiveReservations } from "../hooks/useActiveReservations";
+import { handleFirestoreErrorOnly } from "~/src/utils/informationHandler";
 
 export default function ReservationsTable({
   studentCode,
@@ -40,27 +41,37 @@ export default function ReservationsTable({
       return;
     }
 
-    // Solo cargar desde Firestore si no hay filtro
     const fetchData = async () => {
       setLoading(true);
-      try {
+
+      const result = await handleFirestoreErrorOnly(async () => {
         const cursor = page === 1 ? undefined : cursors.current[page - 1];
 
-        const result = await getPaginatedReservationsByUser(
+        const res = await getPaginatedReservationsByUser(
           studentCode,
           rowsPerPage,
           cursor,
           sortDescriptor.direction === "descending" ? "desc" : "asc"
         );
 
+        // Ensure we throw to be handled by the toast handler if result is somehow falsy
+        if (!res) {
+          throw new Error("No se pudieron cargar las reservas.");
+        }
+
+        return res;
+      }, {
+        errorTitle: "Error al cargar reservas",
+        errorMessage: "No se pudieron cargar las reservas. Intenta nuevamente.",
+      });
+
+      if (result) {
         setReservations(result.reservations);
         cursors.current[page] = result.lastVisible;
         setHasMore(result.reservations.length === rowsPerPage);
-      } catch (err) {
-        console.error("Error loading reservations:", err);
-      } finally {
-        setLoading(false);
       }
+
+      setLoading(false);
     };
 
     fetchData();

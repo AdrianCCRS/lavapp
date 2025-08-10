@@ -6,10 +6,12 @@ import './styles/global.css'
 import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { HeroUIProvider } from '@heroui/system'
+import { ToastProvider } from '@heroui/toast'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HeroUIProvider className='light'>
+      <ToastProvider/>
         <AuthProvider>
           <BrowserRouter>
             <App />

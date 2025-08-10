@@ -2,6 +2,7 @@ import { db } from "@config/firebase.config";
 import { setDoc, doc, Timestamp, getDoc, query, updateDoc, collection, where, getDocs, QueryDocumentSnapshot, orderBy, limit, startAfter } from "firebase/firestore";
 import type { Reservation } from "../types";
 import type { PaginatedReservations } from "../types";
+import { handleFirestore, handleFirestoreErrorOnly } from "~/src/utils/informationHandler";
 
 export async function reserve(studentCode: string, washerId: string, userEmail: string): Promise<void> {
   const createdAt = Timestamp.now();
@@ -31,49 +32,58 @@ export async function reserve(studentCode: string, washerId: string, userEmail: 
     state
   };
 
-  const reservationRef = doc(db, "reservations", reservationId);
-  const userRef = doc(db, "users", studentCode);
-
-  try {
+  await handleFirestore(
+    async () => {
+    const reservationRef = doc(db, "reservations", reservationId);
+    const userRef = doc(db, "users", studentCode);
     const userSnap = await getDoc(userRef);
-
     if (!userSnap.exists()) {
       throw new Error("Usuario no encontrado.");
     }
-
     const userData = userSnap.data();
     const currentReservations: string[] = userData.currentReservations || [];
 
-    if (currentReservations.length >= 2) {
-      throw new Error("No puedes tener más de dos reservas activas.");
-    }
-    
-    await setDoc(reservationRef, reservation);
-    await updateDoc(userRef, {
-      currentReservations: [...currentReservations, reservationId]
-    });
+      if (currentReservations.length >= 2) {
+        throw new Error("No puedes tener más de dos reservas activas.");
+      }
+      
+      await setDoc(reservationRef, reservation);
+      await updateDoc(userRef, {
+        currentReservations: [...currentReservations, reservationId]
+      });
 
-    await disableWasher(washerId);
+      await disableWasher(washerId);
 
-  } catch (error) {
-    console.error("Error creando la reserva:", error);
-    throw new Error("No se pudo realizar la reserva.");
-  }
+    } , {
+      successTitle: "Reserva exitosa",
+      successMessage: "Tu reserva ha sido creada exitosamente.",
+      errorTitle: "Error al crear la reserva",
+      errorMessage: "No se pudo crear la reserva. Verifica los datos e intenta nuevamente.",
+      });
 }
 
 async function disableWasher(washerId: string): Promise<void> {
-    const washerRef = doc(db, "washers", washerId);
-    const washer = await getDoc(washerRef);
+  handleFirestoreErrorOnly(
+    async () => {
+      const washerRef = doc(db, "washers", washerId);
+      const washer = await getDoc(washerRef);
 
     if (!washer.exists()) {
-        throw new Error("Washer not found.");
+        throw new Error("La lavadora no existe, washerId: " + washerId);
     }
 
     try{
         await setDoc(washerRef, { available: false }, { merge: true });
     } catch(error){
-        console.error("Error disabling washer: ", error)
+        if (error instanceof Error) {
+            throw new Error("Error al deshabilitar la lavadora: " + error.message);
+        }
+        throw new Error("Error inesperado al deshabilitar la lavadora.");      
     }
+  }, {
+    errorTitle: "Error al deshabilitar la lavadora",
+    errorMessage: "No se pudo deshabilitar la lavadora. Intenta nuevamente.",
+  });
 
 }
 
@@ -83,34 +93,50 @@ export async function getPaginatedReservationsByUser(
     lastDoc?: QueryDocumentSnapshot,
     direction: "asc" | "desc" = "desc"
   ): Promise<PaginatedReservations> {
-    let q = query(
-      collection(db, "reservations"),
-      where("studentCode", "==", studentCode),
-      orderBy("createdAt", direction),
-      limit(pageSize)
+    const result = await handleFirestoreErrorOnly(
+      async () => {
+        let q = query(
+          collection(db, "reservations"),
+          where("studentCode", "==", studentCode),
+          orderBy("createdAt", direction),
+          limit(pageSize)
+        );
+      
+        if (lastDoc) {
+          q = query(q, startAfter(lastDoc));
+        }
+      
+        const snapshot = await getDocs(q);
+      
+        return {
+          reservations: snapshot.docs.map(doc => ({
+            ...doc.data(),
+            id: doc.id
+          }) as Reservation),
+          lastVisible: snapshot.docs[snapshot.docs.length - 1],
+        };
+      }, {
+        errorTitle: "Error al obtener reservas paginadas",
+        errorMessage: "No se pudieron obtener las reservas. Intenta nuevamente.",
+      }
     );
-  
-    if (lastDoc) {
-      q = query(q, startAfter(lastDoc));
+
+    // If handleFirestoreErrorOnly returns null, return empty result with proper typing
+    if (!result) {
+      return {
+        reservations: [],
+        lastVisible: undefined as any // Type assertion needed due to type definition
+      };
     }
-  
-    const snapshot = await getDocs(q);
-  
-    return {
-      reservations: snapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-      }) as Reservation),
-      lastVisible: snapshot.docs[snapshot.docs.length - 1],
-    };
+
+    return result;
 }
 
 export async function getReservationsByDate(date: Timestamp, studentCode: string): Promise<Reservation[]> {
-    try {
+    const reservations = await handleFirestoreErrorOnly(
+    async () => {
       const localDate = date.toDate();
-      console.log(localDate)
   
-      // UTC día local: 00:00:00 y 23:59:59 en tu zona horaria (ej. -05:00)
       const startOfDay = new Date(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 0, 0, 0);
       const endOfDay = new Date(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), 23, 59, 59, 999);
   
@@ -127,7 +153,7 @@ export async function getReservationsByDate(date: Timestamp, studentCode: string
       const snapshot = await getDocs(q);
   
       if (snapshot.empty) {
-        console.log("No reservations found for the given date.");
+        throw new Error("No se encontraron reservas para la fecha dada.");
         return [];
       }
   
@@ -135,25 +161,26 @@ export async function getReservationsByDate(date: Timestamp, studentCode: string
         ...doc.data(),
         id: doc.id
       }) as Reservation);
-    } catch (error) {
-      console.error("Error fetching reservations by date:", error);
-      throw new Error("No se pudieron obtener las reservas por fecha.");
-    }
+    }, {
+    errorTitle: "Error al obtener reservas por fecha",
+    errorMessage: "No se pudieron obtener las reservas por fecha. Intenta nuevamente.",
+    });
+
+    return reservations ?? [];
 }
 
 export async function getReservationById(reservationId: string): Promise<Reservation | null> {
-  try {
+  return handleFirestoreErrorOnly(async () => {
     const reservationRef = doc(db, "reservations", reservationId);
     const snapshot = await getDoc(reservationRef);
 
     if (!snapshot.exists()) {
-      console.log("No reservation found.");
-      return null;
+      throw new Error("Reserva no encontrada.");
     }
 
     const data = snapshot.data();
     if (!data) {
-      throw new Error("Failed to retrieve reservation data.");
+      throw new Error("No se pudo obtener los datos de la reserva.");
     }
 
     const reservation: Reservation = {
@@ -167,10 +194,9 @@ export async function getReservationById(reservationId: string): Promise<Reserva
     };
 
     return reservation;
-  } catch (error) {
-    console.error("Error fetching reservation by ID:", error);
-    throw new Error("No se pudo obtener la reserva.");
-  }
+  }, {
+    errorTitle: "Error al obtener la reserva",
+    errorMessage: "No se pudo obtener la reserva. Intenta nuevamente.",
+  });
 }
-  
   

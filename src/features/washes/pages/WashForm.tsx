@@ -10,6 +10,7 @@ import { maxWashDurationInHours } from "~/src/utils/constants";
 import { useAuth } from "@context/AuthContext"; 
 import { Spinner } from "@heroui/spinner";
 import { useParams } from "react-router-dom";
+import { handleFirestore } from "@/utils/informationHandler";
 
 export default function WashForm() {
   const { customUser, loading } = useAuth();
@@ -19,28 +20,32 @@ export default function WashForm() {
   const [loadingWash, setLoadingWash] = useState(false);
   const navigate = useNavigate();
 
-  const onSubmit = async (data: WashForm) => {
-    try {
-      setError(null);
-      setLoadingWash(true);
-      await startWashing(
-        data.studentCode,
-        data.washerId,
-        data.duration,
-        data.reservationId,
-        data.news
-      );
-      setLoadingWash(false);
-      navigate("current-wash");
-    } catch (err) {
-      setLoadingWash(false);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Ocurrió un error inesperado");
-      }
-    }
-  };
+ const onSubmit = async (data: WashForm) => {
+  setError(null);
+  setLoadingWash(true);
+
+  const result = await handleFirestore(() =>
+    startWashing(
+      data.studentCode,
+      data.washerId,
+      data.duration,
+      data.reservationId,
+      data.news
+    ), {
+      successMessage: "Lavado iniciado correctamente.",
+      errorMessage: "No se pudo iniciar el lavado.",
+      successTitle: "Lavado iniciado",
+      errorTitle: "Error al iniciar lavado",
+    });
+
+  setLoadingWash(false);
+
+  if (result) {
+    navigate("current-wash");
+  } else {
+    setError("No se pudo iniciar la lavada.");
+  }
+};
 
   if (loading) return <Spinner />;
 

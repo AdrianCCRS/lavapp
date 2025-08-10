@@ -19,15 +19,8 @@ export default function ReserveButton({
 
   async function handleReserve() {
     setLoading(true);
-    try {
-      await reserve(studentCode, washerId, userEmail);
-      // Optionally show success toast here
-    } catch (error) {
-      console.log(error)
-      // Optionally show error toast here
-    } finally {
-      setLoading(false);
-    }
+    await reserve(studentCode, washerId, userEmail);
+    setLoading(false);
   }
 
   return (

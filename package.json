@@ -25,6 +25,7 @@
     "@heroui/system": "2.4.18",
     "@heroui/table": "^2.2.21",
     "@heroui/theme": "2.4.20",
+    "@heroui/toast": "^2.0.14",
     "@tailwindcss/vite": "^4.1.10",
     "autoprefixer": "^10.4.21",
     "firebase": "^11.9.1",

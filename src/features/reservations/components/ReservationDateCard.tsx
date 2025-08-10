@@ -24,7 +24,6 @@ export default function ReservationDateCard({
         0, 0, 0
       );
       const timestamp = Timestamp.fromDate(jsDate);
-      console.log("Fecha enviada al filtro:", jsDate.toString());
       onFilter(timestamp);
     }
   };

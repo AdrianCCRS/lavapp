@@ -30,7 +30,6 @@ export function AuthProvider({children} : {children: React.ReactNode}) {
                     const res = await getUserProps();
                     setCustomUser(res);
                 } catch (err){
-                    console.error("Error fetching user properties:", err);
                     setCustomUser(null);
                 }
             }

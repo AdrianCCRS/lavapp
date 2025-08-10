@@ -4,6 +4,7 @@ import type { Wash } from '../types';
 import { getCurrentWashes } from '../services/washes.service';
 import { useAuth } from '@/context/AuthContext';
 import { Spinner } from '@heroui/spinner';
+import { handleFirestoreErrorOnly } from "~/src/utils/informationHandler";
 
 export default function CurrentWashes() {
     const [currentWashes, setCurrentWashes] = useState<Wash[]>([]);
@@ -11,14 +12,22 @@ export default function CurrentWashes() {
     const auth = useAuth();
     useEffect(() => {
         const fetchCurrentWashes = async () => {
-            try {
+            const result = await handleFirestoreErrorOnly(async () => {
                 if (auth.customUser) {
                     const washes = await getCurrentWashes(auth.customUser.id);
                     setCurrentWashes(washes);
                     setIsLoading(false);
+                } else {
+                    throw new Error("Usuario no autenticado");
                 }
-            } catch (error) {
-                console.error("Error fetching current washes:", error);
+            }, {
+                errorTitle: "Error al obtener lavadas en curso",
+                errorMessage: "No se pudieron obtener las lavadas en curso. Intenta nuevamente.",
+            });
+
+            if (!result) {
+                // keep loading false only if result path succeeded
+                setIsLoading(false);
             }
         };
 

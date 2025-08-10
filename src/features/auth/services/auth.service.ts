@@ -5,6 +5,7 @@ import { FirebaseError } from "firebase/app";
 import type { User } from "../types";
 import { db } from "@config/firebase.config";
 import { getDocs, collection, query, where } from "firebase/firestore";
+import { handleFirestoreErrorOnly } from "@/utils/informationHandler";
 /**
  * Función para iniciar sesión con correo electrónico y contraseña en firebase auth
  * @param email Correo electrónico del usuario
@@ -14,60 +15,67 @@ import { getDocs, collection, query, where } from "firebase/firestore";
 
 
 export async function login(
-    email: string,
-    password: string
-  ): Promise<UserCredential> {
-    try {
-      return await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      if (error instanceof FirebaseError) {
-        console.log(error.code, error.message)
-        throw new Error(handleAuthFirebaseError(error.code));
+  email: string,
+  password: string
+): Promise<UserCredential | null> {
+  return await handleFirestoreErrorOnly(
+    async () => {
+      try {
+        return await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        if (error instanceof FirebaseError) {
+          throw new Error(handleAuthFirebaseError(error.code));
+        }
+        throw error;
       }
-      throw error; // Re-lanza otros errores no esperados
+    },
+    {
+      errorTitle: "Error al iniciar sesión",
+      errorMessage: "No se pudo iniciar sesión. Verifica tus credenciales.",
     }
-  }
+  );
+}
 
   export async function getUserProps(): Promise<User | null> {
-    const user = auth.currentUser;
-    if (!user || !user.email) {
-      console.log("No user or email found:", user);
-      return null;
-    }
-  
-    try {
+    const returnedUser = await handleFirestoreErrorOnly(
+      async () => {
+      const user = auth.currentUser;
+      if (!user || !user.email) {
+        throw new Error("Usuario no encontrado o correo electrónico no válido.");
+      }
       const q = query(
-        collection(db, "users"),
-        where("email", "==", user.email)
+          collection(db, "users"),
+          where("email", "==", user.email)
       );
       const querySnapshot = await getDocs(q);
-  
+
       if (querySnapshot.empty) {
-        console.log("No document found for email:", user.email);
-        return null;
+        throw new Error("Ningún usuario encontrado con el email: " + user.email);
       }
-  
+
       const userData = querySnapshot.docs[0].data();
       const studentCode = querySnapshot.docs[0].id;
-      return {
-        id: studentCode,
-        firstName: userData.firstName || "",
-        secondName: userData.secondName || "",
-        firstLastName: userData.firstLastName || "",
-        secondLastName: userData.secondLastName || "",
-        currentReservations: userData.currentReservations || [],
-        email: userData.email || "",
-        role: userData.role,
-        phoneNumber: userData.phoneNumber || ""
-      } as User;
-    } catch (error) {
-      console.error("Error fetching user document:", error);
-      throw error;
-    }
+
+        return {
+          id: studentCode,
+          firstName: userData.firstName || "",
+          secondName: userData.secondName || "",
+          firstLastName: userData.firstLastName || "",
+          secondLastName: userData.secondLastName || "",
+          currentReservations: userData.currentReservations || [],
+          email: userData.email || "",
+          role: userData.role,
+          phoneNumber: userData.phoneNumber || ""
+        } as User;
+      }, {
+        errorTitle: "Error al obtener los datos del usuario",
+        errorMessage: "No se pudieron obtener los datos del usuario.",
+      });
+      return returnedUser;
   }
   
 
-  // Opcional: Traductor de errores de Firebase a mensajes amigables
+  //Traductor de errores de Firebase a mensajes amigables
   function handleAuthFirebaseError(code: string): string {
     const errorMap: Record<string, string> = {
       "auth/invalid-email": "Correo electrónico inválido",
