@@ -87,6 +87,17 @@ async function disableWasher(washerId: string): Promise<void> {
 
 }
 
+async function enableWasher(washerId: string): Promise<void> {
+  await handleFirestoreErrorOnly(
+    async () => {
+      const washerRef = doc(db, "washers", washerId);
+      await updateDoc(washerRef, { available: true });
+    }, {
+      errorTitle: "Error al habilitar la lavadora",
+      errorMessage: "No se pudo habilitar la lavadora. Intenta nuevamente.",
+    });
+}
+
 export async function getPaginatedReservationsByUser(
     studentCode: string,
     pageSize: number = 10,
@@ -197,6 +208,41 @@ export async function getReservationById(reservationId: string): Promise<Reserva
   }, {
     errorTitle: "Error al obtener la reserva",
     errorMessage: "No se pudo obtener la reserva. Intenta nuevamente.",
+  });
+}
+
+export async function cancelReservation(reservationId: string): Promise<void> {
+  await handleFirestore(async () => {
+    const reservationRef = doc(db, "reservations", reservationId);
+    const reservationSnap = await getDoc(reservationRef);
+
+    if (!reservationSnap.exists()) {
+      throw new Error("Reserva no encontrada.");
+    }
+
+    const reservationData = reservationSnap.data() as Reservation;
+    const userRef = doc(db, "users", reservationData.studentCode);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      throw new Error("Usuario no encontrado.");
+    }
+
+    const userData = userSnap.data();
+    const currentReservations: string[] = userData.currentReservations || [];
+    
+    await updateDoc(reservationRef, { state: "cancelled" });
+    
+    await updateDoc(userRef, {
+      currentReservations: currentReservations.filter(id => id !== reservationId)
+    });
+
+    await enableWasher(reservationData.washerId);
+  }, {
+    successTitle: "Reserva cancelada",
+    successMessage: "La reserva ha sido cancelada exitosamente.",
+    errorTitle: "Error al cancelar la reserva",
+    errorMessage: "No se pudo cancelar la reserva. Intenta nuevamente.",
   });
 }
   
