@@ -2,6 +2,7 @@ import { useCountdown } from "@/hooks/useCountdown";
 import type { Reservation } from "../types";
 import { Button } from "@heroui/button";
 import { useNavigate } from "react-router-dom";
+import { cancelReservation } from "../services/reservations.service";
 
 export default function CurrentReservationCard({ reservation }: { reservation: Reservation }) {
   const expiresAt = reservation.expiresAt.toDate(); 
@@ -25,9 +26,18 @@ export default function CurrentReservationCard({ reservation }: { reservation: R
       )}
 
       {!isExpired && (
-        <Button color="primary" className="mt-2" onPress={() => {navigate(`/start/washer/${reservation.washerId}/reservation/${reservation.id}`)}}>
-          Iniciar lavado
-        </Button>
+        <>
+          <Button color="primary" className="mt-2" onPress={() => {navigate(`/start/washer/${reservation.washerId}/reservation/${reservation.id}`)}}>
+            Iniciar lavado
+          </Button>
+          <Button
+            color="danger"
+            className="mt-2"
+            onPress={() => {cancelReservation(reservation.id)}}
+          >
+            Cancelar reserva
+          </Button>
+        </>
       )}
     </div>
   );
