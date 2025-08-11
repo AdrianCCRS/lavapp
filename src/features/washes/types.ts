@@ -11,6 +11,7 @@ export interface WashForm {
 }
 
 export interface Wash {
+    id: string;
     washerId: string;
     studentCode: string;
     startTime: Timestamp;
