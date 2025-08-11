@@ -6,13 +6,28 @@ import { TimeInput } from "@heroui/date-input";
 import { restingTimeInMinutes } from "@/utils/constants";
 import { Time } from "@internationalized/date";
 import {Alert} from "@heroui/alert";
+import { endWash } from "../services/washes.service";
+import { useState } from "react";
 
-export default function CurrentWashCard({ wash }: { wash: Wash }) {
+interface CurrentWashCardProps {
+  wash: Wash;
+  onWashEnded: () => Promise<void>;
+}
+
+export default function CurrentWashCard({ wash, onWashEnded }: CurrentWashCardProps) {
+  const [isEndingWash, setIsEndingWash] = useState(false);
   const maxTimeToEnd = wash.startTime.toDate().getTime() + wash.duration * 60 * 1000 + restingTimeInMinutes * 60 * 1000; 
   const startTime = wash.startTime.toDate();
   const expiresAt = new Date(maxTimeToEnd);
 
   const { minutes, seconds, isExpired } = useCountdown(expiresAt);
+
+  const handleEndWash = async () => {
+    setIsEndingWash(true);
+    await endWash(wash.id);
+    await onWashEnded();
+    setIsEndingWash(false);
+  };
 
   return (
     <div className="flex flex-col border rounded-lg p-4 bg-white shadow">
@@ -41,7 +56,15 @@ export default function CurrentWashCard({ wash }: { wash: Wash }) {
           description="Se le cargará una multa, si tiene alguna queja, por favor comuníquese con alguien de la junta." 
           variant="flat" 
         />
-        <Button color="default" className="mt-2 w-min" variant="solid">He leído y acepto</Button>
+        <Button 
+          onPress={handleEndWash}
+          color="default" 
+          className="mt-2 w-min" 
+          variant="solid"
+          isLoading={isEndingWash}
+        >
+          He leído y acepto
+        </Button>
       </div>
       ) : (
         <span className="text-green-600 font-medium">
@@ -50,7 +73,12 @@ export default function CurrentWashCard({ wash }: { wash: Wash }) {
       )}
 
       {!isExpired && (
-        <Button color="primary" className="mt-2">
+        <Button 
+          color="primary" 
+          className="mt-2"
+          onPress={handleEndWash}
+          isLoading={isEndingWash}
+        >
           Finalizar lavada
         </Button>
       )}

@@ -10,27 +10,27 @@ export default function CurrentWashes() {
     const [currentWashes, setCurrentWashes] = useState<Wash[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const auth = useAuth();
-    useEffect(() => {
-        const fetchCurrentWashes = async () => {
-            const result = await handleFirestoreErrorOnly(async () => {
-                if (auth.customUser) {
-                    const washes = await getCurrentWashes(auth.customUser.id);
-                    setCurrentWashes(washes);
-                    setIsLoading(false);
-                } else {
-                    throw new Error("Usuario no autenticado");
-                }
-            }, {
-                errorTitle: "Error al obtener lavadas en curso",
-                errorMessage: "No se pudieron obtener las lavadas en curso. Intenta nuevamente.",
-            });
-
-            if (!result) {
-                // keep loading false only if result path succeeded
+    
+    const fetchCurrentWashes = async () => {
+        const result = await handleFirestoreErrorOnly(async () => {
+            if (auth.customUser) {
+                const washes = await getCurrentWashes(auth.customUser.id);
+                setCurrentWashes(washes);
                 setIsLoading(false);
+            } else {
+                throw new Error("Usuario no autenticado");
             }
-        };
+        }, {
+            errorTitle: "Error al obtener lavadas en curso",
+            errorMessage: "No se pudieron obtener las lavadas en curso. Intenta nuevamente.",
+        });
 
+        if (!result) {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchCurrentWashes();
     }, [auth.customUser]);
 
@@ -42,7 +42,11 @@ export default function CurrentWashes() {
                     <Spinner />
                 ) : (
                     currentWashes.map((wash) => (
-                        <CurrentWashCard wash={wash} />
+                        <CurrentWashCard 
+                            key={wash.id} 
+                            wash={wash} 
+                            onWashEnded={fetchCurrentWashes}
+                        />
                     ))
                 )}
             </div>
