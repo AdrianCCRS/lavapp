@@ -16,7 +16,22 @@ export async function startWashing(
   const timeStr = now.toTimeString().split(" ")[0].replace(/:/g, "-");
 
   const washId = `wash_${studentCode}_${washerId}_${dateStr}_${timeStr}`;
+  
+  // Check if reservation can be used
+  const reservationRef = doc(db, "reservations", reservationId);
+  const reservationSnap = await getDoc(reservationRef);
+  
+  if (!reservationSnap.exists()) {
+    throw new Error("La reserva no existe.");
+  }
+  
+  const reservationData = reservationSnap.data();
+  if (reservationData.state !== "waiting") {
+    throw new Error("Esta reserva ya fue utilizada o ha expirado.");
+  }
+  
   const wash: Wash = {
+    id: washId,
     washerId,
     studentCode,
     startTime,
@@ -81,7 +96,7 @@ export async function getCurrentWashes(studentCode: string): Promise<Wash[]> {
     for (const washId of currentWashes) {
         const washSnap = await getDoc(doc(db, "washes", washId));
         if (washSnap.exists()) {
-            washes.push(washSnap.data() as Wash);
+            washes.push({ ...washSnap.data(), id: washSnap.id } as Wash);
         }
     }
 
@@ -100,6 +115,8 @@ export async function endWash(washId: string): Promise<void> {
 
         const washData = washSnap.data() as Wash;
         const userRef = doc(db, "users", washData.studentCode);
+        const washerRef = doc(db, "washers", washData.washerId);
+        await updateDoc(washerRef, { available: true });
         await updateDoc(washRef, {
             endTime: Timestamp.now()
         });
