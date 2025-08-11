@@ -41,7 +41,7 @@ export default function WashForm() {
   setLoadingWash(false);
 
   if (result) {
-    navigate("current-wash");
+    navigate("/current-wash", { replace: true });
   } else {
     setError("No se pudo iniciar la lavada.");
   }
