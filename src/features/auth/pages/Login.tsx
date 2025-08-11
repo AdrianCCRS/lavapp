@@ -20,7 +20,7 @@ export default function Login() {
     try {
       setError(null);
       await login(data.email, data.password);
-      navigate("/dashboard");
+      navigate("/");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
